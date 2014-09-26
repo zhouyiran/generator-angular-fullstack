@@ -4,6 +4,11 @@ var express = require('express');
 var controller = require('./<%= name %>.controller');
 <% if(filters.mongoose && authenticated) { %>var auth = require('../../auth/auth.service');<% } %>
 var router = express.Router();
+<% if(filters.mongoose && authenticated) { %>
+router.use(auth.isAuthenticated(), function(req, res, next) {
+  req.query.user = req.user._id;
+  next();
+});<% } %>
 
 router.get('/', <% if(filters.mongoose && authenticated) { %>auth.hasRole('admin'), <% } %>controller.index);<% if(filters.mongoose) { %>
 router.get('/:id',<% if(filters.mongoose && authenticated) { %>auth.isAuthenticated(), <% } %> controller.show);
