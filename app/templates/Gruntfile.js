@@ -46,7 +46,11 @@ module.exports = function (grunt) {
       options: {
         title: '<%%= pkg.name %>',
         dest: 'docs',
-        html5Mode: false
+        html5Mode: false,
+        scripts: [
+          '<%%= yeoman.client %>/bower_components/angular/angular.js',
+          '<%%= yeoman.client %>/bower_components/angular-animate/angular-animate.js'
+        ]
       },
       app: {
         title: ' <%%= pkg.name %>',
@@ -159,7 +163,14 @@ module.exports = function (grunt) {
           '<%%= yeoman.client %>/**/*.js',
           '!<%%= yeoman.client %>/bower_components/**/*'
         ],
-        tasks: ['ngdocs']
+        tasks: [
+          'useminPrepare',
+          'autoprefixer',
+          'ngtemplates',
+          'concat',
+          'ngAnnotate',
+          'ngdocs'
+        ]
       },
       <% } %>
       gruntfile: {

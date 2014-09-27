@@ -1,5 +1,11 @@
 'use strict';
 
+/**
+ * @ngdoc service
+ * @name <%= scriptAppName %>.service:Auth
+ * @description The Auth service is here to help you authorize.
+ */
+
 angular.module('<%= scriptAppName %>')
   .factory('Auth', function Auth($location, $rootScope, $http, User, $cookieStore, $q) {
     var currentUser = {};
@@ -10,11 +16,13 @@ angular.module('<%= scriptAppName %>')
     return {
 
       /**
-       * Authenticate user and save token
-       *
-       * @param  {Object}   user     - login info
+       * @ngdoc
+       * @methodOf <%= scriptAppName %>.service:Auth
+       * @name <%= scriptAppName %>.service:Auth#login
+       * @param  {User}   user     - login info
        * @param  {Function} callback - optional
-       * @return {Promise}
+       * @returns {Promise} A promie to be fulfilled on login
+       * @description Authenticate user and save token
        */
       login: function(user, callback) {
         var cb = callback || angular.noop;
@@ -40,21 +48,32 @@ angular.module('<%= scriptAppName %>')
       },
 
       /**
-       * Delete access token and user info
-       *
-       * @param  {Function}
+       * @ngdoc
+       * @methodOf <%= scriptAppName %>.service:Auth
+       * @name <%= scriptAppName %>.service:Auth#logout
+       * @description Delete access token and user info
        */
+
       logout: function() {
         $cookieStore.remove('token');
         currentUser = {};
       },
 
       /**
-       * Create a new user
-       *
-       * @param  {Object}   user     - user info
+       * @ngdoc
+       * @methodOf <%= scriptAppName %>.service:Auth
+       * @name <%= scriptAppName.service %>:Auth#createUser
+       * @param  {User}   user User information. Requires format as follows:
+       * ```javascript
+       * {
+       *   email: 'foo@bar.com',
+       *   name: 'Foo Bar',
+       *   password: 'il0v3Angul4r!'
+       * }
+       * ```
        * @param  {Function} callback - optional
-       * @return {Promise}
+       * @returns {Promise} To be fulfilled upon verification from the server
+       * @description Create a new user
        */
       createUser: function(user, callback) {
         var cb = callback || angular.noop;
@@ -72,12 +91,26 @@ angular.module('<%= scriptAppName %>')
       },
 
       /**
-       * Change password
+       * @ngdoc
+       * @methodOf <%= scriptAppName %>.service:Auth
+       * @name <%= scriptAppName %>.service:Auth#changePassword
+       * @param  {String}   oldPassword The user's old password
+       * @param  {String}   newPassword The user's new password
+       * @param  {Function} [callback] A callback to be called when the password is changed.
+       * @returns {Promise} A promise that will be resolved when the password is changed.
+       * @description Change password
        *
-       * @param  {String}   oldPassword
-       * @param  {String}   newPassword
-       * @param  {Function} callback    - optional
-       * @return {Promise}
+       * @example
+       * <example module="<%= scriptAppName %>">
+       *   <file name="script.js">
+       *     Auth.changePassword('foo', 'bar', console.log);
+       *   </file>
+       *   <file name="script.html">
+       *     <div style="background-color: yellow;">
+       *       <h1>Hello</h1>
+       *     </div>
+       *   </file>
+       * </example>
        */
       changePassword: function(oldPassword, newPassword, callback) {
         var cb = callback || angular.noop;
@@ -93,33 +126,46 @@ angular.module('<%= scriptAppName %>')
       },
 
       /**
-       * Gets all available info on authenticated user
-       *
-       * @return {Object} user
+       * @ngdoc
+       * @methodOf <%= scriptAppName %>.service:Auth
+       * @name <%= scriptAppName %>.service:Auth#getCurrentUser
+       * @returns {User} The current logged-in user
+       * @description Get the current logged-in user
        */
       getCurrentUser: function() {
         return currentUser;
       },
 
       /**
-       * Check if a user is logged in
-       *
-       * @return {Boolean}
+       * @ngdoc
+       * @methodOf <%= scriptAppName %>.service:Auth
+       * @name <%= scriptAppName %>.service:Auth#isLoggedIn
+       * @returns {Boolean} Whether or not a user is logged in
+       * @description Check if a user is logged in
        */
       isLoggedIn: function() {
         return currentUser.hasOwnProperty('role');
       },
 
       /**
-       * Waits for currentUser to resolve before checking if user is logged in
+       * @ngdoc
+       * @methodOf <%= scriptAppName %>.service:Auth
+       * @name <%= scriptAppName %>.service:Auth#isLoggedInAsync
+       * @param {Function} [cb] Callback to be called once the user is logged in.
+       * @returns {Promise} The promise that will be resolved when the user is logged in
+       * @description Waits for currentUser to resolve before checking if user is logged in
        */
       isLoggedInAsync: function(cb) {
+        cb = cb || angular.noop;
+
         if(currentUser.hasOwnProperty('$promise')) {
           currentUser.$promise.then(function() {
             cb(true);
           }).catch(function() {
             cb(false);
           });
+
+          return currentUser.$promise;
         } else if(currentUser.hasOwnProperty('role')) {
           cb(true);
         } else {
@@ -128,16 +174,21 @@ angular.module('<%= scriptAppName %>')
       },
 
       /**
-       * Check if a user is an admin
-       *
-       * @return {Boolean}
+       * @ngdoc
+       * @methodOf <%= scriptAppName %>.service:Auth
+       * @name <%= scriptAppName %>.service:Auth#isAdmin
+       * @returns {Boolean} Whether or not the user is an admin
+       * @description Check if a user is an admin
        */
       isAdmin: function() {
         return currentUser.role === 'admin';
       },
 
       /**
-       * Get auth token
+       * @ngdoc
+       * @methodOf <%= scriptAppName %>.service:Auth
+       * @name <%= scriptAppName %>.service:Auth#getToken
+       * @description Get Auth token
        */
       getToken: function() {
         return $cookieStore.get('token');

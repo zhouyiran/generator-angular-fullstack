@@ -2,7 +2,7 @@
 <% if (filters.ngdoc) { %>
 /**
  * @ngdoc overview
- * @name <%= appname %>
+ * @name <%= scriptAppName %>
  * @description Description goes here
  */
 <% } %>
