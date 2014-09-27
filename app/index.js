@@ -104,6 +104,11 @@ var AngularFullstackGenerator = yeoman.generators.Base.extend({
         message: "Would you like to include Bootstrap?"
       }, {
         type: "confirm",
+        name: "ngdoc",
+        message: "Would you like to use ngdocs?",
+        default: true
+      }, {
+        type: "confirm",
         name: "uibootstrap",
         message: "Would you like to include UI Bootstrap?",
         when: function (answers) {
@@ -114,6 +119,7 @@ var AngularFullstackGenerator = yeoman.generators.Base.extend({
         this.filters[answers.markup] = true;
         this.filters[answers.stylesheet] = true;
         this.filters[answers.router] = true;
+        this.filters.ngdoc = !!answers.ngdoc;
         this.filters.bootstrap = !!answers.bootstrap;
         this.filters.uibootstrap =  !!answers.uibootstrap;
       cb();

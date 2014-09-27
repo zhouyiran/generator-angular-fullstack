@@ -31,7 +31,33 @@ module.exports = function (grunt) {
       // configurable paths
       client: require('./bower.json').appPath || 'client',
       dist: 'dist'
+    },<% if(filters.ngdoc) { %>
+    connect: {
+      docs: {
+        options: {
+          base: ['docs'],
+          port: 9004,
+          livereload: true,
+          open: true
+        },
+      }
     },
+    ngdocs: {
+      options: {
+        title: '<%%= pkg.name %>',
+        dest: 'docs',
+        html5Mode: false
+      },
+      app: {
+        title: ' <%%= pkg.name %>',
+        api: true,
+        src: [
+          '<%%= yeoman.client %>/**/*.js',
+          '!<%%= yeoman.client %>/bower_components/**/*'
+        ]
+      }
+    },
+    <% } %>
     express: {
       options: {
         port: process.env.PORT || 9000
@@ -127,7 +153,15 @@ module.exports = function (grunt) {
           '<%%= yeoman.client %>/{app,components}/**/*.spec.{coffee,litcoffee,coffee.md}'
         ],
         tasks: ['karma']
-      },<% } %>
+      },<% } %><% if(filters.ngdoc) { %>
+      ngdocs: {
+        files: [
+          '<%%= yeoman.client %>/**/*.js',
+          '!<%%= yeoman.client %>/bower_components/**/*'
+        ],
+        tasks: ['ngdocs']
+      },
+      <% } %>
       gruntfile: {
         files: ['Gruntfile.js']
       },
@@ -739,8 +773,14 @@ module.exports = function (grunt) {
         'autoprefixer',
         'concurrent:debug'
       ]);
+    }<% if(filters.ngdoc) { %>
+    if(target !== 'dist') {
+      grunt.task.run([
+        'ngdocs',
+        'connect',
+      ]);
     }
-
+    <% } %>
     grunt.task.run([
       'clean:server',
       'env:all',<% if(filters.stylus) { %>

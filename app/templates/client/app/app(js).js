@@ -1,5 +1,11 @@
 'use strict';
-
+<% if (filters.ngdoc) { %>
+/**
+ * @ngdoc overview
+ * @name <%= appname %>
+ * @description Description goes here
+ */
+<% } %>
 angular.module('<%= scriptAppName %>', [<%= angularModules %>])
   <% if(filters.ngroute) { %>.config(function ($routeProvider, $locationProvider<% if(filters.auth) { %>, $httpProvider<% } %>) {
     $routeProvider
