@@ -1,5 +1,11 @@
 'use strict'
 
+/**
+ * @ngdoc service
+ * @name <%= scriptAppName %>.service:Auth
+ * @description The Auth service is here to help you authorize.
+ */
+
 angular.module '<%= scriptAppName %>'
 .factory 'Auth', ($location, $rootScope, $http, User, $cookieStore, $q) ->
   currentUser = if $cookieStore.get 'token' then User.get() else {}
