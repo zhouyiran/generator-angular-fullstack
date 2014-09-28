@@ -1,6 +1,14 @@
 'use strict';
 
 /**
+ * @ngdoc directive
+ * @name <%= scriptAppName %>.directive:mongooseError
+ * @restrict A
+ * @requires ngModel
+ * @description A directive to remove mongoose errors
+ */
+
+/**
  * Removes server error when user updates input
  */
 angular.module('<%= scriptAppName %>')
