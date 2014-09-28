@@ -4,6 +4,10 @@
  * @ngdoc overview
  * @name <%= scriptAppName %>
  * @description Description goes here
+ *
+ * ##Not seeing examples?
+ *
+ * - Make sure the batarang plugin is not turned on for this page.
  */
 <% } %>
 angular.module('<%= scriptAppName %>', [<%= angularModules %>])

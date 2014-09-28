@@ -4,6 +4,12 @@
  * @ngdoc service
  * @name <%= scriptAppName %>.service:Auth
  * @description The Auth service is here to help you authorize.
+ * @requires $location
+ * @requires $rootScope
+ * @requires $http
+ * @requires <%= scriptAppName %>.service:User
+ * @requires $cookieStore
+ * @requires $q
  */
 
 angular.module('<%= scriptAppName %>')

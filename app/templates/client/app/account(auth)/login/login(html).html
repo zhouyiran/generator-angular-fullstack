@@ -8,7 +8,7 @@
       <p>Admin account is <code>admin@admin.com</code> / <code>admin</code></p>
     </div>
     <div class="col-sm-12">
-      <form class="form" name="form" ng-submit="login(form)" novalidate>
+      <form class="form" name="form" ng-submit="login()" novalidate>
 
         <div class="form-group">
           <label>Email</label>
@@ -34,7 +34,7 @@
         </div>
 
         <div>
-          <button class="btn btn-inverse btn-lg btn-login" type="submit">
+          <button class="btn btn-inverse btn-lg btn-login" ng-disabled="form.$invalid" type="submit">
             Login
           </button>
           <a class="btn btn-default btn-lg btn-register" href="/signup">

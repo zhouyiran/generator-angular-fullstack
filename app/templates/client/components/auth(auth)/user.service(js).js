@@ -4,6 +4,7 @@
  * @ngdoc service
  * @name <%= scriptAppName %>.service:User
  * @description  User is a $resource to help manage users.
+ * @requires $resource
  */
 
 angular.module('<%= scriptAppName %>')
@@ -18,23 +19,22 @@ angular.module('<%= scriptAppName %>')
        * @methodOf <%= scriptAppName %>.service:User
        * @name <%= scriptAppName %>.service:User#changePassword
        * @description Update a `User`'s password
-       * @example
-       * <example name="changePass" module="<%= scriptAppName %>">
-       *   <file name="changePass.js">
-       *     angular.module(<%= scriptAppName %>)
-       *       .controller('foo', function(User) {
-       *         var user = User.get();
        *
-       *         user.$promise.then(function() {
-       *           user.password = 'ih34rt4ngul4rFullst4ck!'
-       *           user.changePassword({
-       *             oldPassword: 'foo',
-       *             newPassword: 'bar',
-       *           });
-       *         });
+       * For example:
+       *
+       * ```javascript
+       * angular.module('pass')
+       *   .controller('foo', function($scope, User) {
+       *     var user = User.get();
+       *     user.$promise.then(function() {
+       *       user.password = 'ih34rt4ngul4rFullst4ck!'
+       *       user.changePassword({
+       *         oldPassword: 'foo',
+       *         newPassword: 'bar',
        *       });
-       *   </file>
-       * </example>
+       *     });
+       *   });
+       * ```
        */
 
       changePassword: {
