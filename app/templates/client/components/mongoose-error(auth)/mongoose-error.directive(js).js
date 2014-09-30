@@ -5,12 +5,9 @@
  * @name <%= scriptAppName %>.directive:mongooseError
  * @restrict A
  * @requires ngModel
- * @description A directive to remove mongoose errors
+ * @description A directive to remove server $invalid errors when the user updates the input field.
  */
 
-/**
- * Removes server error when user updates input
- */
 angular.module('<%= scriptAppName %>')
   .directive('mongooseError', function () {
     return {
