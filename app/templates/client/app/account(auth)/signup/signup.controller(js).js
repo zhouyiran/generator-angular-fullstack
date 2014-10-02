@@ -8,7 +8,6 @@
  * @requires <%= scriptAppName %>.service:Auth<% if(filters.oauth) { %>
  * @requires $location<% } %>
  */
-
 angular.module('<%= scriptAppName %>')
   .controller('SignupCtrl', function($scope, Auth<% if (filters.ngroute) { %>, $location<% } %><% if (filters.uirouter) { %>, $state<% } %><% if (filters.oauth) { %>, $window<% } %>) {
 
@@ -18,7 +17,6 @@ angular.module('<%= scriptAppName %>')
      * @name <%= scriptAppName %>.controller:SignupCtrl#user
      * @description The current user
      */
-
     $scope.user = {};
 
     /**
@@ -69,7 +67,6 @@ angular.module('<%= scriptAppName %>')
    * @param {String} provider The (local) name of the provider to use for authentication
    * @description A function to login with oauth.  Simply changes the route and the routing takes care of the rest.
    */
-
     $scope.loginOauth = function(provider) {
       $window.location.href = '/auth/' + provider;
     };<% } %>

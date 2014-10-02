@@ -109,7 +109,6 @@ angular.module('<%= scriptAppName %>')
        * @param {String} modelName The model name for which to no longer sync updates.
        * @description Removes listeners for a given model's socket.io update events, triggered by Mongoose
        */
-
       unsyncUpdates: function (modelName) {
         socket.removeAllListeners(modelName + ':save');
         socket.removeAllListeners(modelName + ':remove');

@@ -8,7 +8,6 @@
  * @requires <%= scriptAppName %>.service:User
  * @requires <%= scriptAppName %>.service:Auth
  */
-
 angular.module('<%= scriptAppName %>')
   .controller('SettingsCtrl', function ($scope, User, Auth) {
 
@@ -18,7 +17,6 @@ angular.module('<%= scriptAppName %>')
      * @name <%= scriptAppName %>.controller:SettingsCtrl#errors
      * @description A map of errors indexed by type.
      */
-
     $scope.errors = {};
 
     /**

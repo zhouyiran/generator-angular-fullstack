@@ -18,7 +18,6 @@ angular.module('<%= scriptAppName %>')
      * @name <%= scriptAppName %>.controller:LoginCtrl#user
      * @description The current user
      */
-
     $scope.user = {};
 
     /**
