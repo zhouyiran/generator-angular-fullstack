@@ -24,6 +24,15 @@ var AngularFullstackGenerator = yeoman.generators.Base.extend({
     this.pkg = require('../package.json');
 
     this.filters = {};
+
+    // dynamic assertion statement
+    this.does = this.is = function(foo) {
+      if (this.filters.should) {
+        return foo + '.should';
+      } else {
+        return 'expect(' + foo + ').to';
+      }
+    }.bind(this);
   },
 
   info: function () {
@@ -36,21 +45,29 @@ var AngularFullstackGenerator = yeoman.generators.Base.extend({
 
     if(this.config.get('filters')) {
       this.prompt([{
-        type: "confirm",
-        name: "skipConfig",
-        message: "Existing .yo-rc configuration found, would you like to use it?",
+        type: 'confirm',
+        name: 'skipConfig',
+        message: 'Existing .yo-rc configuration found, would you like to use it?',
         default: true,
       }], function (answers) {
         this.skipConfig = answers.skipConfig;
 
+        this.filters = this._.defaults(this.config.get('filters'), {
+          bootstrap: true,
+          uibootstrap: true,
+          jasmine: true
+        });
+
         // NOTE: temp(?) fix for #403
-        if(typeof this.oauth==='undefined') {
+        if(typeof this.filters.oauth==='undefined') {
           var strategies = Object.keys(this.filters).filter(function(key) {
             return key.match(/Auth$/) && key;
           });
 
-          if(strategies.length) this.config.set('oauth', true);
+          if(strategies.length) this.filters.oauth = true;
         }
+
+        this.config.forceSave();
 
         cb();
       }.bind(this));
@@ -66,10 +83,10 @@ var AngularFullstackGenerator = yeoman.generators.Base.extend({
     this.log('# Client\n');
 
     this.prompt([{
-        type: "list",
-        name: "script",
-        message: "What would you like to write scripts with?",
-        choices: [ "JavaScript", "CoffeeScript"],
+        type: 'list',
+        name: 'script',
+        message: 'What would you like to write scripts with?',
+        choices: [ 'JavaScript', 'CoffeeScript'],
         filter: function( val ) {
           var filterMap = {
             'JavaScript': 'js',
@@ -79,38 +96,38 @@ var AngularFullstackGenerator = yeoman.generators.Base.extend({
           return filterMap[val];
         }
       }, {
-        type: "list",
-        name: "markup",
-        message: "What would you like to write markup with?",
-        choices: [ "HTML", "Jade"],
+        type: 'list',
+        name: 'markup',
+        message: 'What would you like to write markup with?',
+        choices: [ 'HTML', 'Jade'],
         filter: function( val ) { return val.toLowerCase(); }
       }, {
-        type: "list",
-        name: "stylesheet",
+        type: 'list',
+        name: 'stylesheet',
         default: 1,
-        message: "What would you like to write stylesheets with?",
-        choices: [ "CSS", "Sass", "Stylus", "Less"],
+        message: 'What would you like to write stylesheets with?',
+        choices: [ 'CSS', 'Sass', 'Stylus', 'Less'],
         filter: function( val ) { return val.toLowerCase(); }
       },  {
-        type: "list",
-        name: "router",
+        type: 'list',
+        name: 'router',
         default: 1,
-        message: "What Angular router would you like to use?",
-        choices: [ "ngRoute", "uiRouter"],
+        message: 'What Angular router would you like to use?',
+        choices: [ 'ngRoute', 'uiRouter'],
         filter: function( val ) { return val.toLowerCase(); }
       }, {
-        type: "confirm",
-        name: "bootstrap",
-        message: "Would you like to include Bootstrap?"
+        type: 'confirm',
+        name: 'bootstrap',
+        message: 'Would you like to include Bootstrap?'
       }, {
         type: "confirm",
         name: "ngdoc",
         message: "Would you like to use ngdocs?",
         default: true
       }, {
-        type: "confirm",
-        name: "uibootstrap",
-        message: "Would you like to include UI Bootstrap?",
+        type: 'confirm',
+        name: 'uibootstrap',
+        message: 'Would you like to include UI Bootstrap?',
         when: function (answers) {
           return answers.bootstrap;
         }
@@ -122,7 +139,7 @@ var AngularFullstackGenerator = yeoman.generators.Base.extend({
         this.filters.ngdoc = !!answers.ngdoc;
         this.filters.bootstrap = !!answers.bootstrap;
         this.filters.uibootstrap =  !!answers.uibootstrap;
-      cb();
+        cb();
       }.bind(this));
   },
 
@@ -134,13 +151,13 @@ var AngularFullstackGenerator = yeoman.generators.Base.extend({
     this.log('\n# Server\n');
 
     this.prompt([{
-      type: "confirm",
-      name: "mongoose",
-      message: "Would you like to use mongoDB with Mongoose for data modeling?"
+      type: 'confirm',
+      name: 'mongoose',
+      message: 'Would you like to use mongoDB with Mongoose for data modeling?'
     }, {
-      type: "confirm",
-      name: "auth",
-      message: "Would you scaffold out an authentication boilerplate?",
+      type: 'confirm',
+      name: 'auth',
+      message: 'Would you scaffold out an authentication boilerplate?',
       when: function (answers) {
         return answers.mongoose;
       }
@@ -169,9 +186,9 @@ var AngularFullstackGenerator = yeoman.generators.Base.extend({
         }
       ]
     }, {
-      type: "confirm",
-      name: "socketio",
-      message: "Would you like to use socket.io?",
+      type: 'confirm',
+      name: 'socketio',
+      message: 'Would you like to use socket.io?',
       // to-do: should not be dependent on mongoose
       when: function (answers) {
         return answers.mongoose;
@@ -186,6 +203,55 @@ var AngularFullstackGenerator = yeoman.generators.Base.extend({
         answers.oauth.forEach(function(oauthStrategy) {
           this.filters[oauthStrategy] = true;
         }.bind(this));
+      }
+
+      cb();
+    }.bind(this));
+  },
+
+  projectPrompts: function() {
+    if(this.skipConfig) return;
+    var cb = this.async();
+    var self = this;
+
+    this.log('\n# Project\n');
+
+    this.prompt([{
+      type: 'list',
+      name: 'testing',
+      message: 'What would you like to write tests with?',
+      choices: [ 'Jasmine', 'Mocha + Chai + Sinon'],
+      filter: function( val ) {
+        var filterMap = {
+          'Jasmine': 'jasmine',
+          'Mocha + Chai + Sinon': 'mocha'
+        };
+
+        return filterMap[val];
+      }
+    }, {
+      type: 'list',
+      name: 'chai',
+      message: 'What would you like to write Chai assertions with?',
+      choices: ['Expect', 'Should'],
+      filter: function( val ) {
+        return val.toLowerCase();
+      },
+      when: function( answers ) {
+        return  answers.testing === 'mocha';
+      }
+    }], function (answers) {
+      this.filters[answers.testing] = true;
+      if (answers.testing === 'mocha') {
+        this.filters.jasmine = false;
+        this.filters.should = false;
+        this.filters.expect = false;
+        this.filters[answers.chai] = true;
+      }
+      if (answers.testing === 'jasmine') {
+        this.filters.mocha = false;
+        this.filters.should = false;
+        this.filters.expect = false;
       }
 
       cb();
@@ -213,10 +279,15 @@ var AngularFullstackGenerator = yeoman.generators.Base.extend({
     if(this.skipConfig) return;
     var appPath = 'client/app/';
     var extensions = [];
-    var filters = [];
+    var filters = [
+      'ngroute',
+      'uirouter',
+      'jasmine',
+      'mocha',
+      'expect',
+      'should'
+    ].filter(function(v) {return this.filters[v];}, this);
 
-    if(this.filters.ngroute) filters.push('ngroute');
-    if(this.filters.uirouter) filters.push('uirouter');
     if(this.filters.coffee) extensions.push('coffee');
     if(this.filters.js) extensions.push('js');
     if(this.filters.html) extensions.push('html');
@@ -240,11 +311,6 @@ var AngularFullstackGenerator = yeoman.generators.Base.extend({
   },
 
   ngModules: function() {
-    this.filters = this._.defaults(this.config.get('filters'), {
-      bootstrap: true,
-      uibootstrap: true
-    });
-
     var angModules = [
       "'ngCookies'",
       "'ngResource'",
@@ -255,7 +321,7 @@ var AngularFullstackGenerator = yeoman.generators.Base.extend({
     if(this.filters.uirouter) angModules.push("'ui.router'");
     if(this.filters.uibootstrap) angModules.push("'ui.bootstrap'");
 
-    this.angularModules = "\n  " + angModules.join(",\n  ") +"\n";
+    this.angularModules = '\n  ' + angModules.join(',\n  ') +'\n';
   },
 
   generate: function() {

@@ -10,7 +10,7 @@
  */
 
 angular.module('<%= scriptAppName %>')
-  .controller('SignupCtrl', function ($scope, Auth, $location<% if (filters.oauth) { %>, $window<% } %>) {
+  .controller('SignupCtrl', function($scope, Auth<% if (filters.ngroute) { %>, $location<% } %><% if (filters.uirouter) { %>, $state<% } %><% if (filters.oauth) { %>, $window<% } %>) {
 
     /**
      * @ngdoc
@@ -44,11 +44,11 @@ angular.module('<%= scriptAppName %>')
           email: $scope.user.email,
           password: $scope.user.password
         })
-        .then( function() {
+        .then(function() {
           // Account created, redirect to home
-          $location.path('/');
+          <% if (filters.ngroute) { %>$location.path('/');<% } %><% if (filters.uirouter) { %>$state.go('main');<% } %>
         })
-        .catch( function(err) {
+        .catch(function(err) {
           err = err.data;
           $scope.errors = {};
 
@@ -60,7 +60,7 @@ angular.module('<%= scriptAppName %>')
         });
       }
     };
-<% if(filters.oauth) {%>
+<% if (filters.oauth) {%>
 
   /**
    * @ngdoc
@@ -69,6 +69,7 @@ angular.module('<%= scriptAppName %>')
    * @param {String} provider The (local) name of the provider to use for authentication
    * @description A function to login with oauth.  Simply changes the route and the routing takes care of the rest.
    */
+
     $scope.loginOauth = function(provider) {
       $window.location.href = '/auth/' + provider;
     };<% } %>

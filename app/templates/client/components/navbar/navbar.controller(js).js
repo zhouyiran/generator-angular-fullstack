@@ -7,7 +7,7 @@
  */
 
 angular.module('<%= scriptAppName %>')
-  .controller('NavbarCtrl', function ($scope, $location<% if(filters.auth) {%>, Auth<% } %>) {
+  .controller('NavbarCtrl', function ($scope<% if(!filters.uirouter) { %>, $location<% } %><% if (filters.auth) {%>, Auth<% } %>) {
 
     /**
      * @ngdoc
@@ -18,8 +18,9 @@ angular.module('<%= scriptAppName %>')
 
     $scope.menu = [{
       'title': 'Home',
-      'link': '/'
+      <% if (filters.uirouter) { %>'state': 'main'<% } else { %>'link': '/'<% } %>
     }];
+
     /**
      * @ngdoc
      * @propertyOf <%= scriptAppName %>.controller:NavbarCtrl
@@ -28,7 +29,7 @@ angular.module('<%= scriptAppName %>')
      * @description Is the menu collapsed?
      */
 
-    $scope.isCollapsed = true;<% if(filters.auth) {%>
+    $scope.isCollapsed = true;<% if (filters.auth) {%>
 
     /**
      * @ngdoc
@@ -51,16 +52,6 @@ angular.module('<%= scriptAppName %>')
     /**
      * @ngdoc
      * @methodOf <%= scriptAppName %>.controller:NavbarCtrl
-     * @name <%= scriptAppName %>.controller:NavbarCtrl#getCurrentUser
-     * @description A function to return the current user
-     * @returns {User} The currently-logged-in user
-     */
-
-    $scope.getCurrentUser = Auth.getCurrentUser;
-
-    /**
-     * @ngdoc
-     * @methodOf <%= scriptAppName %>.controller:NavbarCtrl
      * @name <%= scriptAppName %>.controller:NavbarCtrl#logout
      * @description Logs the current user out
      */
@@ -73,6 +64,16 @@ angular.module('<%= scriptAppName %>')
     /**
      * @ngdoc
      * @methodOf <%= scriptAppName %>.controller:NavbarCtrl
+     * @name <%= scriptAppName %>.controller:NavbarCtrl#getCurrentUser
+     * @description A function to return the current user
+     * @returns {User} The currently-logged-in user
+     */
+
+    $scope.getCurrentUser = Auth.getCurrentUser;<% } %><% if(!filters.uirouter) { %>
+
+    /**
+     * @ngdoc
+     * @methodOf <%= scriptAppName %>.controller:NavbarCtrl
      * @name <%= scriptAppName %>.controller:NavbarCtrl#isActive
      * @param {String} route The route to check
      * @returns {Boolean} Whether or not the passed item is active.
@@ -81,5 +82,5 @@ angular.module('<%= scriptAppName %>')
 
     $scope.isActive = function(route) {
       return route === $location.path();
-    };
+    };<% } %>
   });

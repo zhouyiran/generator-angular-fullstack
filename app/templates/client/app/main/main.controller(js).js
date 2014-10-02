@@ -10,28 +10,30 @@
  */
 
 angular.module('<%= scriptAppName %>')
-  .controller('MainCtrl', function ($scope, $http<% if(filters.socketio) { %>, socket<% } %>) {
+  .controller('MainCtrl', function($scope, $http<% if(filters.socketio) { %>, socket<% } %>) {
     /**
      * @ngdoc
      * @propertyOf <%= scriptAppName %>.controller:MainCtrl
      * @name <%= scriptAppName %>.controller:MainCtrl#awesomeThings
      * @description A list of awesome things.
      */
+
     $scope.awesomeThings = [];
 
     $http.get('/api/things').success(function(awesomeThings) {
-      $scope.awesomeThings = awesomeThings;<% if(filters.socketio) { %>
+      $scope.awesomeThings = awesomeThings;<% if (filters.socketio) { %>
       socket.syncUpdates('thing', $scope.awesomeThings);<% } %>
     });
-<% if(filters.mongoose) { %>
+<% if (filters.mongoose) { %>
     /**
      * @ngdoc
      * @methodOf <%= scriptAppName %>.controller:MainCtrl
      * @name <%= scriptAppName %>.controller:MainCtrl#addThing
      * @description Saves the current thing on the scope via the api
      */
+
     $scope.addThing = function() {
-      if($scope.newThing === '') {
+      if ($scope.newThing === '') {
         return;
       }
       $http.post('/api/things', { name: $scope.newThing });
@@ -47,9 +49,9 @@ angular.module('<%= scriptAppName %>')
      */
     $scope.deleteThing = function(thing) {
       $http.delete('/api/things/' + thing._id);
-    };<% } %><% if(filters.socketio) { %>
+    };<% } %><% if (filters.socketio) { %>
 
-    $scope.$on('$destroy', function () {
+    $scope.$on('$destroy', function() {
       socket.unsyncUpdates('thing');
     });<% } %>
   });

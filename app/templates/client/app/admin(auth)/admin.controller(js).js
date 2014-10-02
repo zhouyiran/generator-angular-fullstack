@@ -11,7 +11,7 @@
  */
 
 angular.module('<%= scriptAppName %>')
-  .controller('AdminCtrl', function ($scope, $http, Auth, User) {
+  .controller('AdminCtrl', function($scope, $http, Auth, User) {
 
     /**
      * @ngdoc

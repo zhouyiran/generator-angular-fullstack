@@ -16,7 +16,9 @@ module.exports = function (grunt) {
     ngtemplates: 'grunt-angular-templates',
     cdnify: 'grunt-google-cdn',
     protractor: 'grunt-protractor-runner',
-    buildcontrol: 'grunt-build-control'
+    injector: 'grunt-asset-injector',
+    buildcontrol: 'grunt-build-control',
+    istanbul_check_coverage: 'grunt-mocha-istanbul'
   });
 
   // Time how long tasks take. Can help when optimizing build times
@@ -108,7 +110,7 @@ module.exports = function (grunt) {
           '<%%= yeoman.client %>/{app,components}/**/*.mock.js'
         ],
         tasks: ['newer:jshint:all', 'karma']
-      },<% if(filters.stylus) { %>
+      },<% if (filters.stylus) { %>
       injectStylus: {
         files: [
           '<%%= yeoman.client %>/{app,components}/**/*.styl'],
@@ -118,7 +120,7 @@ module.exports = function (grunt) {
         files: [
           '<%%= yeoman.client %>/{app,components}/**/*.styl'],
         tasks: ['stylus', 'autoprefixer']
-      },<% } %><% if(filters.sass) { %>
+      },<% } %><% if (filters.sass) { %>
       injectSass: {
         files: [
           '<%%= yeoman.client %>/{app,components}/**/*.{scss,sass}'],
@@ -128,7 +130,7 @@ module.exports = function (grunt) {
         files: [
           '<%%= yeoman.client %>/{app,components}/**/*.{scss,sass}'],
         tasks: ['sass', 'autoprefixer']
-      },<% } %><% if(filters.less) { %>
+      },<% } %><% if (filters.less) { %>
       injectLess: {
         files: [
           '<%%= yeoman.client %>/{app,components}/**/*.less'],
@@ -138,13 +140,13 @@ module.exports = function (grunt) {
         files: [
           '<%%= yeoman.client %>/{app,components}/**/*.less'],
         tasks: ['less', 'autoprefixer']
-      },<% } %><% if(filters.jade) { %>
+      },<% } %><% if (filters.jade) { %>
       jade: {
         files: [
           '<%%= yeoman.client %>/{app,components}/*',
           '<%%= yeoman.client %>/{app,components}/**/*.jade'],
         tasks: ['jade']
-      },<% } %><% if(filters.coffee) { %>
+      },<% } %><% if (filters.coffee) { %>
       coffee: {
         files: [
           '<%%= yeoman.client %>/{app,components}/**/*.{coffee,litcoffee,coffee.md}',
@@ -213,14 +215,14 @@ module.exports = function (grunt) {
         },
         src: [
           'server/**/*.js',
-          '!server/**/*.spec.js'
+          '!server/**/*.{spec,integration}.js'
         ]
       },
       serverTest: {
         options: {
           jshintrc: 'server/.jshintrc-spec'
         },
-        src: ['server/**/*.spec.js']
+        src: ['server/**/*.{spec,integration}.js']
       },
       all: [
         '<%%= yeoman.client %>/{app,components}/**/*.js',
@@ -232,6 +234,21 @@ module.exports = function (grunt) {
           '<%%= yeoman.client %>/{app,components}/**/*.spec.js',
           '<%%= yeoman.client %>/{app,components}/**/*.mock.js'
         ]
+      }
+    },
+
+    jscs: {
+      options: {
+        config: ".jscs.json"
+      },
+      main: {
+        files: {
+          src: [
+            '<%%= yeoman.client %>/app/**/*.js',
+            '<%%= yeoman.client %>/app/**/*.js',
+            'server/**/*.js'
+          ]
+        }
       }
     },
 
@@ -315,10 +332,10 @@ module.exports = function (grunt) {
       dist: {
         files: {
           src: [
-            '<%%= yeoman.dist %>/public/{,*/}*.js',
-            '<%%= yeoman.dist %>/public/{,*/}*.css',
-            '<%%= yeoman.dist %>/public/assets/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
-            '<%%= yeoman.dist %>/public/assets/fonts/*'
+            '<%%= yeoman.dist %>/client/{,*/}*.js',
+            '<%%= yeoman.dist %>/client/{,*/}*.css',
+            '<%%= yeoman.dist %>/client/assets/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
+            '<%%= yeoman.dist %>/client/assets/fonts/*'
           ]
         }
       }
@@ -330,19 +347,19 @@ module.exports = function (grunt) {
     useminPrepare: {
       html: ['<%%= yeoman.client %>/index.html'],
       options: {
-        dest: '<%%= yeoman.dist %>/public'
+        dest: '<%%= yeoman.dist %>/client'
       }
     },
 
     // Performs rewrites based on rev and the useminPrepare configuration
     usemin: {
-      html: ['<%%= yeoman.dist %>/public/{,*/}*.html'],
-      css: ['<%%= yeoman.dist %>/public/{,*/}*.css'],
-      js: ['<%%= yeoman.dist %>/public/{,*/}*.js'],
+      html: ['<%%= yeoman.dist %>/client/{,*/}*.html'],
+      css: ['<%%= yeoman.dist %>/client/{,*/}*.css'],
+      js: ['<%%= yeoman.dist %>/client/{,*/}*.js'],
       options: {
         assetsDirs: [
-          '<%%= yeoman.dist %>/public',
-          '<%%= yeoman.dist %>/public/assets/images'
+          '<%%= yeoman.dist %>/client',
+          '<%%= yeoman.dist %>/client/assets/images'
         ],
         // This is so we update image references in our ng-templates
         patterns: {
@@ -360,7 +377,7 @@ module.exports = function (grunt) {
           expand: true,
           cwd: '<%%= yeoman.client %>/assets/images',
           src: '{,*/}*.{png,jpg,jpeg,gif}',
-          dest: '<%%= yeoman.dist %>/public/assets/images'
+          dest: '<%%= yeoman.dist %>/client/assets/images'
         }]
       }
     },
@@ -371,7 +388,7 @@ module.exports = function (grunt) {
           expand: true,
           cwd: '<%%= yeoman.client %>/assets/images',
           src: '{,*/}*.svg',
-          dest: '<%%= yeoman.dist %>/public/assets/images'
+          dest: '<%%= yeoman.dist %>/client/assets/images'
         }]
       }
     },
@@ -420,7 +437,7 @@ module.exports = function (grunt) {
     // Replace Google CDN references
     cdnify: {
       dist: {
-        html: ['<%%= yeoman.dist %>/public/*.html']
+        html: ['<%%= yeoman.dist %>/client/*.html']
       }
     },
 
@@ -431,7 +448,7 @@ module.exports = function (grunt) {
           expand: true,
           dot: true,
           cwd: '<%%= yeoman.client %>',
-          dest: '<%%= yeoman.dist %>/public',
+          dest: '<%%= yeoman.dist %>/client',
           src: [
             '*.{ico,png,txt}',
             '.htaccess',
@@ -443,7 +460,7 @@ module.exports = function (grunt) {
         }, {
           expand: true,
           cwd: '.tmp/images',
-          dest: '<%%= yeoman.dist %>/public/assets/images',
+          dest: '<%%= yeoman.dist %>/client/assets/images',
           src: ['generated/*']
         }, {
           expand: true,
@@ -486,18 +503,18 @@ module.exports = function (grunt) {
 
     // Run some tasks in parallel to speed up the build process
     concurrent: {
-      server: [<% if(filters.coffee) { %>
-        'coffee',<% } %><% if(filters.jade) { %>
-        'jade',<% } %><% if(filters.stylus) { %>
-        'stylus',<% } %><% if(filters.sass) { %>
-        'sass',<% } %><% if(filters.less) { %>
+      server: [<% if (filters.coffee) { %>
+        'coffee',<% } %><% if (filters.jade) { %>
+        'jade',<% } %><% if (filters.stylus) { %>
+        'stylus',<% } %><% if (filters.sass) { %>
+        'sass',<% } %><% if (filters.less) { %>
         'less',<% } %>
       ],
-      test: [<% if(filters.coffee) { %>
-        'coffee',<% } %><% if(filters.jade) { %>
-        'jade',<% } %><% if(filters.stylus) { %>
-        'stylus',<% } %><% if(filters.sass) { %>
-        'sass',<% } %><% if(filters.less) { %>
+      test: [<% if (filters.coffee) { %>
+        'coffee',<% } %><% if (filters.jade) { %>
+        'jade',<% } %><% if (filters.stylus) { %>
+        'stylus',<% } %><% if (filters.sass) { %>
+        'sass',<% } %><% if (filters.less) { %>
         'less',<% } %>
       ],
       debug: {
@@ -509,11 +526,11 @@ module.exports = function (grunt) {
           logConcurrentOutput: true
         }
       },
-      dist: [<% if(filters.coffee) { %>
-        'coffee',<% } %><% if(filters.jade) { %>
-        'jade',<% } %><% if(filters.stylus) { %>
-        'stylus',<% } %><% if(filters.sass) { %>
-        'sass',<% } %><% if(filters.less) { %>
+      dist: [<% if (filters.coffee) { %>
+        'coffee',<% } %><% if (filters.jade) { %>
+        'jade',<% } %><% if (filters.stylus) { %>
+        'stylus',<% } %><% if (filters.sass) { %>
+        'sass',<% } %><% if (filters.less) { %>
         'less',<% } %>
         'imagemin',
         'svgmin'
@@ -530,9 +547,60 @@ module.exports = function (grunt) {
 
     mochaTest: {
       options: {
-        reporter: 'spec'
+        reporter: 'spec',
+        require: 'mocha.conf.js'
       },
-      src: ['server/**/*.spec.js']
+      unit: {
+        src: ['server/**/*.spec.js']
+      },
+      integration: {
+        src: ['server/**/*.integration.js']
+      }
+    },
+
+    mocha_istanbul: {
+      unit: {
+        options: {
+          excludes: [
+            '**/*.spec.js',
+            '**/*.mock.js',
+            '**/*.integration.js'
+          ],
+          reporter: 'spec',
+          require: ['mocha.conf.js'],
+          mask: '**/*.spec.js',
+          coverageFolder: 'coverage/server/unit'
+        },
+        src: 'server'
+      },
+      integration: {
+        options: {
+          excludes: [
+            '**/*.spec.js',
+            '**/*.mock.js',
+            '**/*.integration.js'
+          ],
+          reporter: 'spec',
+          require: ['mocha.conf.js'],
+          mask: '**/*.integration.js',
+          coverageFolder: 'coverage/server/integration'
+        },
+        src: 'server'
+      }
+    },
+
+    istanbul_check_coverage: {
+      default: {
+        options: {
+          coverageFolder: 'coverage/**',
+          check: {
+            lines: 80,
+            statements: 80,
+            branches: 80,
+            functions: 80
+          }
+        }
+      }
     },
 
     protractor: {
@@ -556,7 +624,7 @@ module.exports = function (grunt) {
         NODE_ENV: 'production'
       },
       all: localConfig
-    },<% if(filters.jade) { %>
+    },<% if (filters.jade) { %>
 
     // Compiles Jade to html
     jade: {
@@ -576,7 +644,7 @@ module.exports = function (grunt) {
           ext: '.html'
         }]
       }
-    },<% } %><% if(filters.coffee) { %>
+    },<% } %><% if (filters.coffee) { %>
 
     // Compiles CoffeeScript to JavaScript
     coffee: {
@@ -596,7 +664,7 @@ module.exports = function (grunt) {
           ext: '.js'
         }]
       }
-    },<% } %><% if(filters.stylus) { %>
+    },<% } %><% if (filters.stylus) { %>
 
     // Compiles Stylus to CSS
     stylus: {
@@ -613,7 +681,7 @@ module.exports = function (grunt) {
           '.tmp/app/app.css' : '<%%= yeoman.client %>/app/app.styl'
         }
       }
-    },<% } %><% if(filters.sass) { %>
+    },<% } %><% if (filters.sass) { %>
 
     // Compiles Sass to CSS
     sass: {
@@ -630,7 +698,7 @@ module.exports = function (grunt) {
           '.tmp/app/app.css' : '<%%= yeoman.client %>/app/app.scss'
         }
       }
-    },<% } %><% if(filters.less) { %>
+    },<% } %><% if (filters.less) { %>
 
     // Compiles Less to CSS
     less: {
@@ -671,7 +739,7 @@ module.exports = function (grunt) {
                '!{.tmp,<%%= yeoman.client %>}/{app,components}/**/*.mock.js']
             ]
         }
-      },<% if(filters.stylus) { %>
+      },<% if (filters.stylus) { %>
 
       // Inject component styl into app.styl
       stylus: {
@@ -690,7 +758,7 @@ module.exports = function (grunt) {
             '!<%%= yeoman.client %>/app/app.styl'
           ]
         }
-      },<% } %><% if(filters.sass) { %>
+      },<% } %><% if (filters.sass) { %>
 
       // Inject component scss into app.scss
       sass: {
@@ -709,7 +777,7 @@ module.exports = function (grunt) {
             '!<%%= yeoman.client %>/app/app.{scss,sass}'
           ]
         }
-      },<% } %><% if(filters.less) { %>
+      },<% } %><% if (filters.less) { %>
 
       // Inject component less into app.less
       less: {
@@ -774,9 +842,9 @@ module.exports = function (grunt) {
     if (target === 'debug') {
       return grunt.task.run([
         'clean:server',
-        'env:all',<% if(filters.stylus) { %>
-        'injector:stylus', <% } %><% if(filters.less) { %>
-        'injector:less', <% } %><% if(filters.sass) { %>
+        'env:all',<% if (filters.stylus) { %>
+        'injector:stylus', <% } %><% if (filters.less) { %>
+        'injector:less', <% } %><% if (filters.sass) { %>
         'injector:sass', <% } %>
         'concurrent:server',
         'injector',
@@ -794,9 +862,9 @@ module.exports = function (grunt) {
     <% } %>
     grunt.task.run([
       'clean:server',
-      'env:all',<% if(filters.stylus) { %>
-      'injector:stylus', <% } %><% if(filters.less) { %>
-      'injector:less', <% } %><% if(filters.sass) { %>
+      'env:all',<% if (filters.stylus) { %>
+      'injector:stylus', <% } %><% if (filters.less) { %>
+      'injector:less', <% } %><% if (filters.sass) { %>
       'injector:sass', <% } %>
       'concurrent:server',
       'injector',
@@ -814,21 +882,22 @@ module.exports = function (grunt) {
     grunt.task.run(['serve']);
   });
 
-  grunt.registerTask('test', function(target) {
+  grunt.registerTask('test', function(target, option) {
     if (target === 'server') {
       return grunt.task.run([
         'env:all',
         'env:test',
-        'mochaTest'
+        'mochaTest:unit',
+        'mochaTest:integration'
       ]);
     }
 
     else if (target === 'client') {
       return grunt.task.run([
         'clean:server',
-        'env:all',<% if(filters.stylus) { %>
-        'injector:stylus', <% } %><% if(filters.less) { %>
-        'injector:less', <% } %><% if(filters.sass) { %>
+        'env:all',<% if (filters.stylus) { %>
+        'injector:stylus', <% } %><% if (filters.less) { %>
+        'injector:less', <% } %><% if (filters.sass) { %>
         'injector:sass', <% } %>
         'concurrent:test',
         'injector',
@@ -838,20 +907,68 @@ module.exports = function (grunt) {
     }
 
     else if (target === 'e2e') {
-      return grunt.task.run([
-        'clean:server',
-        'env:all',
-        'env:test',<% if(filters.stylus) { %>
-        'injector:stylus', <% } %><% if(filters.less) { %>
-        'injector:less', <% } %><% if(filters.sass) { %>
-        'injector:sass', <% } %>
-        'concurrent:test',
-        'injector',
-        'wiredep',
-        'autoprefixer',
-        'express:dev',
-        'protractor'
-      ]);
+
+      if (option === 'prod') {
+        return grunt.task.run([
+          'build',
+          'env:all',
+          'env:prod',
+          'express:prod',
+          'protractor'
+        ]);
+      }
+
+      else {
+        return grunt.task.run([
+          'clean:server',
+          'env:all',
+          'env:test',<% if (filters.stylus) { %>
+          'injector:stylus', <% } %><% if (filters.less) { %>
+          'injector:less', <% } %><% if (filters.sass) { %>
+          'injector:sass', <% } %>
+          'concurrent:test',
+          'injector',
+          'wiredep',
+          'autoprefixer',
+          'express:dev',
+          'protractor'
+        ]);
+      }
+    }
+
+    else if (target === 'coverage') {
+
+      if (option === 'unit') {
+        return grunt.task.run([
+          'env:all',
+          'env:test',
+          'mocha_istanbul:unit'
+        ]);
+      }
+
+      else if (option === 'integration') {
+        return grunt.task.run([
+          'env:all',
+          'env:test',
+          'mocha_istanbul:integration'
+        ]);
+      }
+
+      else if (option === 'check') {
+        return grunt.task.run([
+          'istanbul_check_coverage'
+        ]);
+      }
+
+      else {
+        return grunt.task.run([
+          'env:all',
+          'env:test',
+          'mocha_istanbul',
+          'istanbul_check_coverage'
+        ]);
+      }
+
     }
 
     else grunt.task.run([
@@ -861,9 +978,9 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('build', [
-    'clean:dist',<% if(filters.stylus) { %>
-    'injector:stylus', <% } %><% if(filters.less) { %>
-    'injector:less', <% } %><% if(filters.sass) { %>
+    'clean:dist',<% if (filters.stylus) { %>
+    'injector:stylus', <% } %><% if (filters.less) { %>
+    'injector:less', <% } %><% if (filters.sass) { %>
     'injector:sass', <% } %>
     'concurrent:dist',
     'injector',

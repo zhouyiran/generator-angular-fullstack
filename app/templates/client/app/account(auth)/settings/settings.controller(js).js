@@ -18,6 +18,7 @@ angular.module('<%= scriptAppName %>')
      * @name <%= scriptAppName %>.controller:SettingsCtrl#errors
      * @description A map of errors indexed by type.
      */
+
     $scope.errors = {};
 
     /**
@@ -29,15 +30,15 @@ angular.module('<%= scriptAppName %>')
     $scope.changePassword = function() {
       $scope.submitted = true;
       if($scope.form.$valid) {
-        Auth.changePassword( $scope.user.oldPassword, $scope.user.newPassword )
-        .then( function() {
-          $scope.message = 'Password successfully changed.';
-        })
-        .catch( function() {
-          $scope.form.password.$setValidity('mongoose', false);
-          $scope.errors.other = 'Incorrect password';
-          $scope.message = '';
-        });
+        Auth.changePassword($scope.user.oldPassword, $scope.user.newPassword)
+          .then(function() {
+            $scope.message = 'Password successfully changed.';
+          })
+          .catch(function() {
+            $scope.form.password.$setValidity('mongoose', false);
+            $scope.errors.other = 'Incorrect password';
+            $scope.message = '';
+          });
       }
-		};
+    };
   });

@@ -1,7 +1,7 @@
 'use strict';
 
-var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
+var mongoose = require('mongoose-bird')();
+var Schema = mongoose.Schema;
 
 var <%= classedName %>Schema = new Schema({
   <% if(authenticated) { %>user: [ {type: Schema.Types.ObjectId, ref: 'user'} ],<% } %>

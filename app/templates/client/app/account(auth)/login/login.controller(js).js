@@ -10,7 +10,7 @@
  */
 
 angular.module('<%= scriptAppName %>')
-  .controller('LoginCtrl', function ($scope, Auth, $location) {
+  .controller('LoginCtrl', function($scope, Auth<% if (filters.ngroute) { %>, $location<% } %><% if (filters.uirouter) { %>, $state<% } %><% if (filters.oauth) { %>, $window<% } %>) {
 
     /**
      * @ngdoc
@@ -20,7 +20,7 @@ angular.module('<%= scriptAppName %>')
      */
 
     $scope.user = {};
-    k
+
     /**
      * @ngdoc
      * @propertyOf <%= scriptAppName %>.controller:LoginCtrl
@@ -49,16 +49,16 @@ angular.module('<%= scriptAppName %>')
           email: $scope.user.email,
           password: $scope.user.password
         })
-        .then( function() {
+        .then(function() {
           // Logged in, redirect to home
-          $location.path('/');
+          <% if (filters.ngroute) { %>$location.path('/');<% } %><% if (filters.uirouter) { %>$state.go('main');<% } %>
         })
-        .catch( function(err) {
+        .catch(function(err) {
           $scope.errors.other = err.message;
         });
       }
     };
-<% if(filters.oauth) {%>
+<% if (filters.oauth) {%>
 
     /**
      * @ngdoc

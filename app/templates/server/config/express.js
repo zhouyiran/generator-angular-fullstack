@@ -17,7 +17,7 @@ var config = require('./environment');<% if (filters.auth) { %>
 var passport = require('passport');<% } %><% if (filters.twitterAuth) { %>
 var session = require('express-session');
 var mongoStore = require('connect-mongo')(session);
-var mongoose = require('mongoose');<% } %>
+var mongoose = require('mongoose-bird')();<% } %>
 
 module.exports = function(app) {
   var env = app.get('env');
@@ -30,8 +30,8 @@ module.exports = function(app) {
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
   app.use(methodOverride());
-  app.use(cookieParser());
-  <% if (filters.auth) { %>app.use(passport.initialize());<% } %><% if (filters.twitterAuth) { %>
+  app.use(cookieParser());<% if (filters.auth) { %>
+  app.use(passport.initialize());<% } %><% if (filters.twitterAuth) { %>
 
   // Persist sessions with mongoStore
   // We need to enable sessions for passport twitter because its an oauth 1.0 strategy
@@ -41,11 +41,11 @@ module.exports = function(app) {
     saveUninitialized: true,
     store: new mongoStore({ mongoose_connection: mongoose.connection })
   }));
-  <% } %>
+<% } %>
   if ('production' === env) {
-    app.use(favicon(path.join(config.root, 'public', 'favicon.ico')));
-    app.use(express.static(path.join(config.root, 'public')));
-    app.set('appPath', config.root + '/public');
+    app.use(favicon(path.join(config.root, 'client', 'favicon.ico')));
+    app.use(express.static(path.join(config.root, 'client')));
+    app.set('appPath', config.root + '/client');
     app.use(morgan('dev'));
   }
 
