@@ -59,7 +59,7 @@ angular.module('<%= scriptAppName %>')
     $scope.logout = function() {
       Auth.logout();
       $location.path('/login');
-    };<% } %>
+    };
 
     /**
      * @ngdoc
