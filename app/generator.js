@@ -258,6 +258,18 @@ export default class Generator extends Base {
 
         this.prompt([{
           type: 'list',
+          name: 'buildtool',
+          message: 'Would you like to use Gulp (experimental) instead of Grunt?',
+          choices: [ 'Grunt', 'Gulp', 'Both'],
+          filter: function(val) {
+            return {
+              'Grunt': 'grunt',
+              'Gulp': 'gulp',
+              'Both': 'grunt_and_gulp'
+            }[val];
+          }
+        }, {
+          type: 'list',
           name: 'testing',
           message: 'What would you like to write tests with?',
           choices: [ 'Jasmine', 'Mocha + Chai + Sinon'],
@@ -281,10 +293,8 @@ export default class Generator extends Base {
             return  answers.testing === 'mocha';
           }
         }], function (answers) {
-          /**
-           * Default to grunt until gulp support is implemented
-           */
-          this.filters.grunt = true;
+          this.filters.grunt = answers.buildtool === 'grunt' || answers.buildtool === 'grunt_and_gulp';
+          this.filters.gulp = answers.buildtool === 'gulp' || answers.buildtool === 'grunt_and_gulp';
 
           this.filters[answers.testing] = true;
           if (answers.testing === 'mocha') {
