@@ -232,7 +232,8 @@ gulp.task('watch', () => {
 
     plugins.watch(_.union(paths.server.scripts, testFiles))
         .pipe(plugins.plumber())
-        .pipe(lintServerScripts());
+        .pipe(lintServerScripts())
+        .pipe(plugins.livereload());
 
     gulp.watch('bower.json', ['bower']);
 });
