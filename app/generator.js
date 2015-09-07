@@ -260,7 +260,8 @@ export default class Generator extends Base {
           type: 'list',
           name: 'buildtool',
           message: 'Would you like to use Gulp (experimental) instead of Grunt?',
-          choices: [ 'Grunt', 'Gulp', 'Both'],
+          choices: ['Grunt', 'Gulp', 'Both'],
+          default: 0,
           filter: function(val) {
             return {
               'Grunt': 'grunt',
