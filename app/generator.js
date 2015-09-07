@@ -142,6 +142,11 @@ export default class Generator extends Base {
             this.filters[answers.router] = true;
             this.filters.bootstrap = !!answers.bootstrap;
             this.filters.uibootstrap =  !!answers.uibootstrap;
+
+            this.scriptExt = answers.script === 'coffee' ? 'coffee' : 'js';
+            this.templateExt = answers.markup;
+            this.styleExt = answers.stylesheet;
+
             cb();
           }.bind(this));
       },

@@ -17,6 +17,7 @@ var plugins = gulpLoadPlugins();
 var config;
 
 const paths = {
+    appPath: require('./bower.json').appPath || 'client',
     client: {
         assets: 'client/assets/**/*',
         images: 'client/assets/images/*',
@@ -164,7 +165,7 @@ gulp.task('inject:<%= styleExt %>', () => {
                     .replace('/client/app/', '')
                     .replace('/client/components/', '../components/')
                     .replace(/_(.*).<%= styleExt %>/, (match, p1, offset, string) => p1);
-                return `@import '${newPath}';`
+                return '@import \'' + newPath + '\';';
             }
         }))
         .pipe(gulp.dest('client/app'));
@@ -241,7 +242,7 @@ gulp.task('watch', () => {
         .pipe(lintServerScripts())
         .pipe(plugins.livereload());
 
-    gulp.watch('bower.json', ['bower']);
+    gulp.watch('bower.json', ['wiredep:client']);
 });
 
 gulp.task('serve', cb => {
@@ -249,7 +250,7 @@ gulp.task('serve', cb => {
         ['lint:scripts'],
         'inject:js',
         'inject:css',
-        'bower',<% if(filters.babel || filters.coffee) { %>
+        'wiredep:client',<% if(filters.babel || filters.coffee) { %>
         ['transpile', 'styles'],<% } else { %>
         'styles',<% } %>
         ['start:server', 'start:client'],
@@ -273,12 +274,36 @@ gulp.task('test:client', () => {
 });
 
 // inject bower components
-gulp.task('bower', () => {
+gulp.task('wiredep:client', () => {
     return gulp.src(paths.views.main)
         .pipe(wiredep({
-            exclude: [/bootstrap-sass-official/, /bootstrap.js/, '/json3/', '/es5-shim/', /bootstrap.css/, /font-awesome.css/ ]
+            exclude: [
+                /bootstrap-sass-official/,
+                /bootstrap.js/,
+                '/json3/',
+                '/es5-shim/',
+                /bootstrap.css/,
+                /font-awesome.css/
+            ],
+            ignorePath: paths.appPath
         }))
         .pipe(gulp.dest('client/'));
+});
+
+gulp.task('wiredep:test', () => {
+    gulp.src(paths.karma)
+        .pipe(wiredep({
+            exclude: [
+                /bootstrap-sass-official/,
+                /bootstrap.js/,
+                '/json3/',
+                '/es5-shim/',
+                /bootstrap.css/,
+                /font-awesome.css/
+            ],
+            devDependencies: true
+        }))
+        .pipe(gulp.dest('./'));
 });
 
 /********************
@@ -290,7 +315,7 @@ gulp.task('build', cb => {
     runSequence(
         'clean:dist',
         'inject',
-        'bower',
+        'wiredep:client',
         [
             'build:images',
             'copy:extras',
