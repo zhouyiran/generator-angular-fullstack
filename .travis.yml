@@ -2,6 +2,7 @@ sudo: false
 language: node_js
 node_js:
   - '0.12'
+  - '4.0.0'
 env:
   global:
     - SAUCE_USERNAME=fullstack_ci
