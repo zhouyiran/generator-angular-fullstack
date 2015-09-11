@@ -41,6 +41,7 @@ const paths = {
     },
     server: {
         scripts: ['server/**/*.<%= scriptExt %>'],
+        json: ['server/**/*.json'],
         test: [
             'server/**/*.spec.js',
             'server/**/*.mock.js',
@@ -177,11 +178,17 @@ gulp.task('styles', () => {
         .pipe(gulp.dest('.tmp/app'));
 });<% if(filters.babel || filters.coffee) { %>
 
-gulp.task('transpile', () => {
+gulp.task('transpile:client', () => {
     return gulp.src(paths.client.scripts)
         .pipe(transpile())
         .pipe(gulp.dest('.tmp'));
 });<% } %>
+
+gulp.task('transpile:server', () => {
+    return gulp.src(_.union(paths.server.scripts, paths.server.json))
+        .pipe(transpile())
+        .pipe(gulp.dest(paths.dist + '/server'));
+});
 
 gulp.task('lint:scripts', cb => runSequence(['lint:scripts:client', 'lint:scripts:server'], cb));
 
@@ -246,12 +253,8 @@ gulp.task('watch', () => {
 });
 
 gulp.task('serve', cb => {
-    runSequence('clean:tmp',
-        ['lint:scripts'],
-        'inject:js',
-        'inject:css',
-        'wiredep:client',<% if(filters.babel || filters.coffee) { %>
-        ['transpile', 'styles'],<% } else { %>
+    runSequence(['clean:tmp', 'lint:scripts', 'inject', 'wiredep:client'],<% if(filters.babel || filters.coffee) { %>
+        ['transpile:client', 'styles'],<% } else { %>
         'styles',<% } %>
         ['start:server', 'start:client'],
         'watch',
@@ -261,7 +264,12 @@ gulp.task('serve', cb => {
 gulp.task('test:server', () => {
     process.env.NODE_ENV = 'test';
     return gulp.src(paths.server.test)
-        .pipe(plugins.mocha({reporter: 'spec'}));
+        .pipe(plugins.mocha({
+            reporter: 'spec',
+            require: [
+                './mocha.conf'
+            ]
+        }));
 });
 
 gulp.task('test:client', () => {
@@ -321,6 +329,7 @@ gulp.task('build', cb => {
             'copy:extras',
             'copy:assets',
             'copy:server',
+            'transpile:server',
             'build:client'
         ],
         cb);
@@ -328,7 +337,7 @@ gulp.task('build', cb => {
 
 gulp.task('clean:dist', () => gulp.src('dist', {read: false}).pipe(plugins.clean()));
 
-gulp.task('build:client', ['transpile', 'styles', 'html'], () => {
+gulp.task('build:client', ['transpile:client', 'styles', 'html'], () => {
     var appFilter = plugins.filter('**/app.js');
     var jsFilter = plugins.filter('**/*.js');
     var cssFilter = plugins.filter('**/*.css');
@@ -362,7 +371,7 @@ gulp.task('build:client', ['transpile', 'styles', 'html'], () => {
 gulp.task('html', function () {
     return gulp.src('client/{app,components}/**/*.html')
         .pipe(plugins.angularTemplatecache({
-            module: 'testApp'
+            module: '<%= scriptAppName %>'
         }))
         .pipe(gulp.dest('.tmp'));
 });
@@ -394,8 +403,7 @@ gulp.task('copy:server', () => {
     return gulp.src([
         'package.json',
         'bower.json',
-        '.bowerrc',
-        'server/**/*'
+        '.bowerrc'
     ], {cwdbase: true})
         .pipe(gulp.dest(paths.dist));
 });
