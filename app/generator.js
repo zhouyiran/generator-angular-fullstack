@@ -7,7 +7,6 @@ import {Base} from 'yeoman-generator';
 import {genBase} from '../generator-base';
 
 export default class Generator extends Base {
-
   constructor(...args) {
     super(...args);
 
@@ -28,7 +27,6 @@ export default class Generator extends Base {
 
   get initializing() {
     return {
-
       init: function () {
         this.filters = {};
 
@@ -49,9 +47,9 @@ export default class Generator extends Base {
           this.prompt([{
             type: 'confirm',
             name: 'skipConfig',
-            message: 'Existing .yo-rc configuration found, would you like to use it?',
+            message: 'Existing .yo-rc configuration found. Would you like to use it?',
             default: true,
-          }], function (answers) {
+          }], answers => {
             this.skipConfig = answers.skipConfig;
 
             if (this.skipConfig) {
@@ -64,20 +62,19 @@ export default class Generator extends Base {
             }
 
             cb();
-          }.bind(this));
+          });
         } else {
           cb();
         }
       }
-
     };
   }
 
   get prompting() {
     return {
-
       clientPrompts: function() {
         if(this.skipConfig) return;
+
         var cb = this.async();
 
         this.log('# Client\n');
@@ -86,34 +83,28 @@ export default class Generator extends Base {
             type: 'list',
             name: 'script',
             message: 'What would you like to write scripts with?',
-            choices: [ 'JavaScript', 'JavaScript + Babel', 'CoffeeScript'],
-            filter: function( val ) {
-              return {
-                'JavaScript': 'js',
-                'JavaScript + Babel': 'babel',
-                'CoffeeScript': 'coffee'
-              }[val];
-            }
+            choices: [ 'JavaScript', 'Babel', 'CoffeeScript'],
+            filter: val => val.toLowerCase()
           }, {
             type: 'list',
             name: 'markup',
             message: 'What would you like to write markup with?',
             choices: ['HTML', 'Jade'],
-            filter: function( val ) { return val.toLowerCase(); }
+            filter: val => val.toLowerCase()
           }, {
             type: 'list',
             name: 'stylesheet',
             default: 1,
             message: 'What would you like to write stylesheets with?',
             choices: [ 'CSS', 'Sass', 'Stylus', 'Less'],
-            filter: function( val ) { return val.toLowerCase(); }
+            filter: val => val.toLowerCase()
           },  {
             type: 'list',
             name: 'router',
             default: 1,
             message: 'What Angular router would you like to use?',
-            choices: [ 'ngRoute', 'uiRouter'],
-            filter: function( val ) { return val.toLowerCase(); }
+            choices: ['ngRoute', 'uiRouter'],
+            filter: val =>  val.toLowerCase()
           }, {
             type: 'confirm',
             name: 'bootstrap',
@@ -122,13 +113,12 @@ export default class Generator extends Base {
             type: 'confirm',
             name: 'uibootstrap',
             message: 'Would you like to include UI Bootstrap?',
-            when: function (answers) {
-              return answers.bootstrap;
-            }
-          }], function (answers) {
-
+            when: answers => answers.bootstrap
+          }], answers => {
             // also set 'js' to true if using babel
-            if(answers.script === 'babel') { this.filters.js = true; }
+            if(answers.script === 'babel') {
+              this.filters.js = true;
+            }
             this.filters[answers.script] = true;
             this.filters[answers.markup] = true;
             this.filters[answers.stylesheet] = true;
@@ -136,7 +126,7 @@ export default class Generator extends Base {
             this.filters.bootstrap = !!answers.bootstrap;
             this.filters.uibootstrap =  !!answers.uibootstrap;
             cb();
-          }.bind(this));
+          });
       },
 
       serverPrompts: function() {
@@ -295,15 +285,14 @@ export default class Generator extends Base {
           cb();
         }.bind(this));
       }
-
     };
   }
 
   get configuring() {
     return {
-
       saveSettings: function() {
         if(this.skipConfig) return;
+
         this.config.set('endpointDirectory', 'server/api/');
         this.config.set('insertRoutes', true);
         this.config.set('registerRoutesFile', 'server/routes.js');
@@ -326,6 +315,7 @@ export default class Generator extends Base {
 
       ngComponent: function() {
         if(this.skipConfig) return;
+
         var appPath = 'client/app/';
         var extensions = [];
         var filters = [
@@ -335,7 +325,7 @@ export default class Generator extends Base {
           'mocha',
           'expect',
           'should'
-        ].filter(function(v) {return this.filters[v];}, this);
+        ].filter(v => this.filters[v]);
 
         if(this.filters.ngroute) filters.push('ngroute');
         if(this.filters.uirouter) filters.push('uirouter');
@@ -360,7 +350,9 @@ export default class Generator extends Base {
             'basePath': 'client',
             'forceConfig': this.forceConfig
           }
-        }, { local: require.resolve('generator-ng-component/app/index.js') });
+        }, {
+          local: require.resolve('generator-ng-component/app/index.js')
+        });
       },
 
       ngModules: function() {
@@ -377,7 +369,6 @@ export default class Generator extends Base {
 
         this.angularModules = '\n  ' + angModules.join(',\n  ') +'\n';
       }
-
     };
   }
 
@@ -387,19 +378,18 @@ export default class Generator extends Base {
 
   get writing() {
     return {
-
       generateProject: function() {
         this.sourceRoot(path.join(__dirname, './templates'));
         this.processDirectory('.', '.');
       },
 
       generateEndpoint: function() {
-        var models;
-        if (this.filters.mongooseModels) {
-          models = 'mongoose';
-        } else if (this.filters.sequelizeModels) {
-          models = 'sequelize';
-        }
+        var models = this.filters.mongooseModels
+          ? 'mongoose'
+          : this.filters.sequelizeModels
+          ? 'sequelize'
+          : undefined;
+
         this.composeWith('angular-fullstack:endpoint', {
           options: {
             route: '/api/things',
@@ -408,24 +398,20 @@ export default class Generator extends Base {
           args: ['thing']
         });
       }
-
     };
   }
 
   get install() {
     return {
-
       installDeps: function() {
         this.installDependencies({
           skipInstall: this.options['skip-install']
         });
       }
-
     };
   }
 
   get end() {
     return {};
   }
-
 }

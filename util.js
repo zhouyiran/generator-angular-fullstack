@@ -4,14 +4,19 @@ import path from 'path';
 import fs from 'fs';
 import glob from 'glob';
 
-function expandFiles(pattern, options) {
-  options = options || {};
+/**
+ * @param {} pattern
+ * @param {Object} [options={}]
+ * @param {String} [options.cwd] - Current Working Directory
+ */
+function expandFiles(pattern, options = {}) {
   var cwd = options.cwd || process.cwd();
-  return glob.sync(pattern, options).filter(function (filepath) {
-    return fs.statSync(path.join(cwd, filepath)).isFile();
-  });
+  return glob.sync(pattern, options).filter(filepath => fs.statSync(path.join(cwd, filepath)).isFile());
 }
 
+/**
+ * 
+ */
 export function rewriteFile(args) {
   args.path = args.path || process.cwd();
   var fullPath = path.join(args.path, args.file);
@@ -26,11 +31,12 @@ function escapeRegExp(str) {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
 }
 
+/**
+ * @param {} args
+ */
 export function rewrite(args) {
   // check if splicable is already in the body text
-  var re = new RegExp(args.splicable.map(function(line) {
-    return '\s*' + escapeRegExp(line);
-  }).join('\n'));
+  var re = new RegExp(args.splicable.map(line => '\s*' + escapeRegExp(line)).join('\n'));
 
   if (re.test(args.haystack)) {
     return args.haystack;
@@ -68,16 +74,23 @@ export function appSuffix(self) {
   return (typeof suffix === 'string') ? self.lodash.classify(suffix) : '';
 }
 
-export function relativeRequire(to, fr) {
-  fr = this.destinationPath(fr || this.filePath);
+/**
+ * @param {String} to
+ * @param {String} [from=this.filePath]
+ */
+export function relativeRequire(to, from = this.filePath) {
+  from = this.destinationPath(from);
   to = this.destinationPath(to);
-  return path.relative(path.dirname(fr), to)
+  return path.relative(path.dirname(from), to)
     .replace(/\\/g, '/') // convert win32 separator to posix
     .replace(/^(?!\.\.)(.*)/, './$1') // prefix non parent path with ./
     .replace(/[\/\\]index\.js$/, ''); // strip index.js suffix from path
 }
 
-function filterFile(template) {
+/**
+ * @returns {Object} - name: template name sans parens filters, filters: array of parens filters
+ */
+function extractFilenameFilters(template) {
   // Find matches for parans
   var filterMatches = template.match(/\(([^)]+)\)/g);
   var filters = [];
@@ -105,24 +118,28 @@ function templateIsUsable(self, filteredFile) {
   return true;
 }
 
+/**
+ * @param {String} source
+ * @param {String} destination
+ */
 export function processDirectory(source, destination) {
-  var self = this;
-  var root = path.isAbsolute(source) ? source : path.join(self.sourceRoot(), source);
+  var root = path.isAbsolute(source) ? source : path.join(this.sourceRoot(), source);
   var files = expandFiles('**', { dot: true, cwd: root });
   var dest, src;
 
-  files.forEach(function(f) {
-    var filteredFile = filterFile(f);
-    if(self.basename) {
-      filteredFile.name = filteredFile.name.replace('basename', self.basename);
+  files.forEach(file => {
+    var filteredFile = extractFilenameFilters(file);
+    if(this.basename) {
+      filteredFile.name = filteredFile.name.replace('basename', this.basename);
     }
-    if(self.name) {
-      filteredFile.name = filteredFile.name.replace('name', self.name);
+    if(this.name) {
+      filteredFile.name = filteredFile.name.replace('name', this.name);
     }
     var name = filteredFile.name;
-    var copy = false, stripped;
+    var copy = false;
+    var stripped;
 
-    src = path.join(root, f);
+    src = path.join(root, file);
     dest = path.join(destination, name);
 
     if(path.basename(dest).indexOf('_') === 0) {
@@ -136,13 +153,13 @@ export function processDirectory(source, destination) {
       copy = true;
     }
 
-    if(templateIsUsable(self, filteredFile)) {
+    if(templateIsUsable(this, filteredFile)) {
       if(copy) {
-        self.fs.copy(src, dest);
+        this.fs.copy(src, dest);
       } else {
-        self.filePath = dest;
-        self.fs.copyTpl(src, dest, self);
-        delete self.filePath;
+        this.filePath = dest;
+        this.fs.copyTpl(src, dest, this);
+        delete this.filePath;
       }
     }
   });

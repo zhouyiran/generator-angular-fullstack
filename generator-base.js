@@ -2,22 +2,22 @@
 
 import util from 'util';
 import path from 'path';
-import lodash from 'lodash';
+import _ from 'lodash';
 import s from 'underscore.string';
 import yoWelcome from 'yeoman-welcome';
 import * as genUtils from './util';
 
 // extend lodash with underscore.string
-lodash.mixin(s.exports());
+_.mixin(s.exports());
 
 export function genBase(self) {
   self = self || this;
 
-  self.lodash = lodash;
+  self.lodash = _;
   self.yoWelcome = yoWelcome;
 
-  self.appname = lodash.camelize(lodash.slugify(
-    lodash.humanize(self.determineAppname())
+  self.appname = _.camelize(_.slugify(
+    _.humanize(self.determineAppname())
   ));
   self.scriptAppName = self.appname + genUtils.appSuffix(self);
 
@@ -47,8 +47,8 @@ export function genNamedBase(self) {
 
   var name = self.name.replace(/\//g, '-');
 
-  self.cameledName = lodash.camelize(name);
-  self.classedName = lodash.classify(name);
+  self.cameledName = _.camelize(name);
+  self.classedName = _.classify(name);
 
   self.basename = path.basename(self.name);
   self.dirname = (self.name.indexOf('/') >= 0) ? path.dirname(self.name) : self.name;
