@@ -261,6 +261,19 @@ gulp.task('serve', cb => {
         cb);
 });
 
+gulp.task('test', cb => {
+    return runSequence('test:server', 'test:client', cb);
+});
+
+gulp.task('test:server', cb => {
+    runSequence(
+        'env:all',
+        'env:test',
+        'mocha:unit',
+        //'mocha:coverage',
+        cb);
+});
+
 gulp.task('test:server', () => {
     process.env.NODE_ENV = 'test';
     return gulp.src(paths.server.test)
@@ -270,6 +283,19 @@ gulp.task('test:server', () => {
                 './mocha.conf'
             ]
         }));
+});
+
+gulp.task('mocha:unit', () => {
+    return gulp.src(paths.server.test)
+        .pipe(plugins.mocha({
+            reporter: 'spec',
+            require: [
+                './mocha.conf'
+            ]
+        }))
+        .once('end', function () {
+            process.exit();
+        });
 });
 
 gulp.task('test:client', () => {
