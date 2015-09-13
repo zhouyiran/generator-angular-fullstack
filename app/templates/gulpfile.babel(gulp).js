@@ -377,7 +377,7 @@ gulp.task('build:client', ['transpile:client', 'styles', 'html'], () => {
         .pipe(assets)
             .pipe(appFilter)
                 .pipe(plugins.addSrc.append('.tmp/templates.js'))
-                .pipe(plugins.concat('app\\app.js'))
+                .pipe(plugins.concat('app/app.js'))
             .pipe(appFilter.restore())
             .pipe(jsFilter)
                 .pipe(plugins.ngmin())
