@@ -65,7 +65,7 @@
     "gulp-uglify": "^1.2.0",
     "gulp-useref": "^1.2.0",
     "gulp-util": "^3.0.5",
-    "gulp-watch": "^4.2.4",<% if(filters.jade) { %>
+    "gulp-watch": "^4.3.5",<% if(filters.jade) { %>
     "gulp-jade": "^1.0.1",<% } if(filters.stylus) { %>
     "gulp-stylus": "^2.0.4",
     "gulp-stylint": "^1.1.3",
