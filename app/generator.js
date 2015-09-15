@@ -90,18 +90,13 @@ export default class Generator extends Base {
 
         this.log('# Client\n');
 
-        this.prompt([{
+        this.prompt([/*{
             type: 'list',
             name: 'script',
             message: 'What would you like to write scripts with?',
-            choices: [ 'JavaScript', 'JavaScript + Babel'],
-            filter: function( val ) {
-              return {
-                'JavaScript': 'js',
-                'JavaScript + Babel': 'babel'
-              }[val];
-            }
-          }, {
+            choices: ['Babel', 'TypeScript'],
+            filter: function(val) { return val.toLowerCase(); }
+          }, */{
             type: 'list',
             name: 'markup',
             message: 'What would you like to write markup with?',
